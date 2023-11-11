@@ -3,14 +3,14 @@
 openapi: 3.0.0
 info:
   version: 0.0.1
-  title: API for returning metadata and configuration for datacenter deployments
+  title: Greenlake platform API for returning metadata and configuration for colo deployments
   description: >-
-    NOTE: These are proposed APIs for gathering metadata information for a DCIM system.
+    NOTE: These are proposed APIs for gathering metadata information for PCE service.
   license:
-    name: APACHE LICENSE, VERSION 2.0
-    url: https://www.apache.org/licenses/LICENSE-2.0.txt
+    name: HPE End User License Agreement
+    url: https://www.hpe.com/us/en/software/licensing.html
 servers:
-  - url: https://us-east1.api.dcim.io
+  - url: https://us-east1.api.privatecloud-ent.greenlake.hpe.com
 security:
   - bearerAuth: []
 paths:
@@ -212,7 +212,7 @@ paths:
       tags:
         - v1alpha1
       operationId: getManagedDeploymentById
-      summary: Get a DriftDeployment by Id
+      summary: Get a Deployment by Id
       parameters:
         - in: path
           name: id
@@ -326,12 +326,24 @@ components:
     ProviderRegistrationInput:
       type: object
       required:
-        - userId
+        - providerName
+        - providerUrl
+        - providerCred
       properties:
-        userId:
+        providerName:
           type: string
-          format: uuid
-          example: 05f0523c-fd03-47fc-981b-9c4333a37b75
+          example: equinix
+        providerUrl:
+          type: string
+          format: url
+          example: api.dcim.io
+        providerCred:
+          type: object
+          properties:
+            secretId:
+              type: string
+            secretKey:
+              type: string
     ProviderList:
       type: object
       required:
@@ -340,7 +352,7 @@ components:
       properties:
         items:
           type: array
-          description: list of managed workspaces for the given User
+          description: list of registered provider
           items:
             $ref: "#/components/schemas/ColoProviderEntry"
         next:
@@ -352,7 +364,7 @@ components:
         count:
           type: integer
           description: >-
-            The number of drift entries returned
+            The number of provider entries returned
           example: 1         
     LocationList:
       type: object

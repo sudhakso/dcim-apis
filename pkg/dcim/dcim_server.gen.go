@@ -18,7 +18,7 @@ type ServerInterface interface {
 	// Get all Deployments filtered by a location Id
 	// (GET /api/v1alpha1/deployments/)
 	GetManagedDeployments(w http.ResponseWriter, r *http.Request, params GetManagedDeploymentsParams)
-	// Get a DriftDeployment by Id
+	// Get a Deployment by Id
 	// (GET /api/v1alpha1/deployments/{id}/)
 	GetManagedDeploymentById(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Get list of location for a specific provider
@@ -51,7 +51,7 @@ func (_ Unimplemented) GetManagedDeployments(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Get a DriftDeployment by Id
+// Get a Deployment by Id
 // (GET /api/v1alpha1/deployments/{id}/)
 func (_ Unimplemented) GetManagedDeploymentById(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)

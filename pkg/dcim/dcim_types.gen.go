@@ -391,10 +391,10 @@ type LocationList struct {
 
 // ProviderList defines model for ProviderList.
 type ProviderList struct {
-	// Count The number of drift entries returned
+	// Count The number of provider entries returned
 	Count int `json:"count"`
 
-	// Items list of managed workspaces for the given User
+	// Items list of registered provider
 	Items []ColoProviderEntry `json:"items"`
 
 	// Next Specifies the pagination cursor for the next page of resources. Will be 'null' if there are no further pages
@@ -403,7 +403,12 @@ type ProviderList struct {
 
 // ProviderRegistrationInput defines model for ProviderRegistrationInput.
 type ProviderRegistrationInput struct {
-	UserId openapi_types.UUID `json:"userId"`
+	ProviderCred struct {
+		SecretId  *string `json:"secretId,omitempty"`
+		SecretKey *string `json:"secretKey,omitempty"`
+	} `json:"providerCred"`
+	ProviderName string `json:"providerName"`
+	ProviderUrl  string `json:"providerUrl"`
 }
 
 // RackEntry defines model for RackEntry.
