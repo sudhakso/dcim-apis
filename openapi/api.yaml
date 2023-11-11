@@ -1,0 +1,1047 @@
+# (C) Copyright 2023-24 Hewlett Packard Enterprise Development LP
+---
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: API for returning metadata and configuration for datacenter deployments
+  description: >-
+    NOTE: These are proposed APIs for gathering metadata information for a DCIM system.
+  license:
+    name: APACHE LICENSE, VERSION 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.txt
+servers:
+  - url: https://us-east1.api.dcim.io
+security:
+  - bearerAuth: []
+paths:
+  /api/v1alpha1/providers/:
+    post:
+      tags:
+        - v1alpha1
+      operationId: registerProvider
+      summary: Configure a Colo provider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProviderRegistrationInput"
+      responses:
+        200:
+          $ref: "#/components/responses/RegistrationResponse"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+        409:
+          $ref: "#/components/responses/Conflict"
+        500:
+          $ref: "#/components/responses/InternalServerError" 
+    get:
+      tags:
+        - v1alpha1
+      operationId: ListProviders
+      summary: Get list of supported provider and regions
+      parameters:
+        - in: query
+          name: next
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 100
+            maximum: 200
+      responses:
+        200:
+          $ref: "#/components/responses/ProviderListResponse"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+  /api/v1alpha1/locations/:
+    get:
+      tags:
+        - v1alpha1
+      operationId: ListLocations
+      summary: Get list of location for a specific provider
+      parameters:
+        - in: query
+          name: next
+          required: false
+          schema:
+           type: string
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 100
+            maximum: 200
+        - in: query
+          name: providerId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "#/components/responses/LocationListResponse"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+  /api/v1alpha1/locations/{id}/devices/:
+    get:
+      tags:
+        - v1alpha1
+      operationId: getManagedDevicesById
+      summary: Get managed devices in a location by Id
+      parameters:
+        - in: path
+          name: id
+          description: Id of a specific location
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          $ref: "#/components/responses/DeviceListResponse"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/InternalServerError"
+  /api/v1alpha1/locations/{id}/racks/:
+    get:
+      tags:
+        - v1alpha1
+      operationId: getManagedRacksById
+      summary: Get managed Racks by a location Id
+      parameters:
+        - in: path
+          name: id
+          description: Id of a specific location
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          $ref: "#/components/responses/RackListResponse"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/InternalServerError"         
+  /api/v1alpha1/services/inventory/actions/get-all/:
+    get:
+      tags:
+        - v1alpha1
+      operationId: getAllInventory
+      summary: Get all inventory
+      parameters:
+        - in: query
+          name: next
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 100
+            maximum: 200     
+      responses:
+        200:
+          $ref: "#/components/responses/HeirarchicalInventoryResponse"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/InternalServerError"         
+  /api/v1alpha1/deployments/:
+    get:
+      tags:
+        - v1alpha1
+      operationId: getManagedDeployments
+      summary: Get all Deployments filtered by a location Id
+      parameters:
+        - in: query
+          name: id
+          description: Id of a specific location instance
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          $ref: "#/components/responses/DeploymentListResponse"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/InternalServerError"         
+  /api/v1alpha1/deployments/{id}/:
+    get:
+      tags:
+        - v1alpha1
+      operationId: getManagedDeploymentById
+      summary: Get a DriftDeployment by Id
+      parameters:
+        - in: path
+          name: id
+          description: Id of a specific deployment instance
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          $ref: "#/components/responses/DeploymentListResponse"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        403:
+          $ref: "#/components/responses/Forbidden"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/InternalServerError"         
+components:
+  securitySchemes:
+    bearerAuth:
+      name: Authorization
+      in: header
+      type: apiKey
+  responses:
+    RegistrationResponse:
+      description: colo provider record
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ColoProviderEntry"
+      headers:
+        Location:
+          description: URL of the created Workspace
+          schema:
+            type: string    
+    ProviderListResponse:
+      description: List of colo providers registered with HPE
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProviderList"           
+    LocationListResponse:
+      description: List of registered locations with a provider
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LocationList"           
+    DeviceListResponse:
+      description: List of registered devices in a location
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceList"     
+    RackListResponse:
+      description: List of registered racks in a location
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RackList"     
+    DeploymentListResponse:
+      description: List of all Greenlake deployments in a location
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeploymentList"     
+    NotFound:
+      description: 404 Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BadRequest:
+      description: 400 Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BadRequestError"
+    Unauthorized:
+      description: 401 Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: 403 Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: 409 Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: 500 Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InternalServerError"
+    HeirarchicalInventoryResponse:
+      description: List of all inventory details in a hierarchical form
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/HeirarchicalInventory"                 
+  schemas:
+    ProviderRegistrationInput:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          format: uuid
+          example: 05f0523c-fd03-47fc-981b-9c4333a37b75
+    ProviderList:
+      type: object
+      required:
+        - items
+        - count
+      properties:
+        items:
+          type: array
+          description: list of managed workspaces for the given User
+          items:
+            $ref: "#/components/schemas/ColoProviderEntry"
+        next:
+          type: string
+          description: >-
+            Specifies the pagination cursor for the next page of resources. Will be 'null' if
+            there are no further pages
+          example: "c8303c9c-bf2f-4bd8-b8e4-205300175694"
+        count:
+          type: integer
+          description: >-
+            The number of drift entries returned
+          example: 1         
+    LocationList:
+      type: object
+      required:
+        - items
+        - count
+      properties:
+        items:
+          type: array
+          description: list of locations for a given Provider
+          items:
+            $ref: "#/components/schemas/LocationEntry"
+        next:
+          type: string
+          description: >-
+            Specifies the pagination cursor for the next page of resources. Will be 'null' if
+            there are no further pages
+          example: "c8303c9c-bf2f-4bd8-b8e4-205300175694"
+        count:
+          type: integer
+          description: >-
+            The number of drift entries returned
+          example: 1         
+    DeviceList:
+      type: object
+      required:
+        - items
+        - count
+      properties:
+        items:
+          type: array
+          description: list of managed workspaces for the given User
+          items:
+            $ref: "#/components/schemas/DeviceEntry"
+        next:
+          type: string
+          description: >-
+            Specifies the pagination cursor for the next page of resources. Will be 'null' if
+            there are no further pages
+          example: "c8303c9c-bf2f-4bd8-b8e4-205300175694"
+        count:
+          type: integer
+          description: >-
+            The number of drift entries returned
+          example: 1         
+    RackList:
+      type: object
+      required:
+        - items
+        - count
+      properties:
+        items:
+          type: array
+          description: list of managed workspaces for the given User
+          items:
+            $ref: "#/components/schemas/RackEntry"
+        next:
+          type: string
+          description: >-
+            Specifies the pagination cursor for the next page of resources. Will be 'null' if
+            there are no further pages
+          example: "c8303c9c-bf2f-4bd8-b8e4-205300175694"
+        count:
+          type: integer
+          description: >-
+            The number of drift entries returned
+          example: 1         
+    DeploymentList:
+      type: object
+      required:
+        - items
+        - count
+      properties:
+        items:
+          type: array
+          description: list of deployments. Each deployment may be PCE or PCBe
+          items:
+            $ref: "#/components/schemas/DeploymentEntry"
+        next:
+          type: string
+          description: >-
+            Specifies the pagination cursor for the next page of resources. Will be 'null' if
+            there are no further pages
+          example: "c8303c9c-bf2f-4bd8-b8e4-205300175694"
+        count:
+          type: integer
+          description: >-
+            The number of drift entries returned
+          example: 1
+    ColoProviderEntry:
+      type: object
+      required:
+        - id
+        - createdAt
+        - credentialsId
+      properties:
+        displayName:
+          type: string
+          description: Unique display name of the colo provider
+          example: "Equinix"     
+        id:
+          type: string
+          format: uuid
+          description: Unique ID of colo provider
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        apiurl:
+          type: string
+          format: url
+          description: Url to access API for the provider
+          example: https://us-east-1.api-seller.equinix.com
+        providerProperties:
+          type: object
+          description: Url to access API for the provider
+          properties:
+            prop1:
+              type: string
+            prop2:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of resource creation in Greenlake
+          readOnly: true
+        credentialsId:
+          type: string
+          format: uuid
+          description: The ID of credentials to retrieve the secret from vault
+          readOnly: true
+    LocationEntry:
+      type: object
+      required:
+        - id
+        - createdAt
+        - providerid
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique ID of colo location resource
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        providerId:
+          type: string
+          format: uuid
+          description: Unique ID of colo provider
+          example: "EQ-05f0523c"
+        providerRegionName:
+          type: string
+          description: Unique region name of the colo provider
+          example: "EQ-US-East-1"
+        parentLocationId:
+          type: string
+          format: uuid
+          description: Location resource Id of unique parent of this location type
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75 or Nil"         
+        glresourceType:
+          type: string
+          enum: ["Region", "Zone"]
+          description: Greenlake location resource type the entity maps to
+          example: "Region"
+        glresourceGrn:
+          type: string
+          description: Greenlake location resource GRN the entity maps to
+          example: "/locations/regions/:id"
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of resource creation
+          readOnly: true
+        locationType:
+          type: string
+          enum: ["ColoFacility", "ColoDatacenter"]
+          description: The type of the location
+          readOnly: true
+          example: ColoFacility
+        postalAddress:
+          type: string
+          description: Postal address for a location (if applicable)
+          readOnly: true
+          example: "#123, Hasley St., NJ, US 58301"
+    DeviceEntry:
+      type: object
+      required:
+        - id
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique resource ID assigned to the device
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        grn:
+          type: string
+          format: url
+          description: Unique greenlake resource name assigned to the device
+          example: "eq/dcim/devices/:id"
+        deviceType:
+          type: string
+          description: Enumeration value assigned to the device
+          example: OneOf [Compute, Network, Array, Power]
+        deviceRole:
+          type: string
+          description: Enumeration value assigned to device indicating the purpose
+          example: OneOf [compute-services, network-services, Storage-services]        
+        rackId:
+          type: string
+          format: uuid
+          description: Rack instance Id the device is installed to
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        datacenterId:
+          type: string
+          format: uuid
+          description: Datacenter ID the device is attached to
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        status:
+          type: string
+          description: Enumeration value with the operational state of the device
+          example: OneOf ["PoweredON", "PoweredOff"]
+        height:
+          type: string
+          description: Height of the device in Rack units
+          example: "1U"
+        weight:
+          type: string
+          description: Weightof the device in lbs
+          example: "1.38lbs"     
+        width:
+          type: integer
+          description: Width of the device in mm
+          example: "600"               
+        depth:
+          type: integer
+          description: Depth of the device in mm
+          example: "1200"                         
+        devicePosition:
+          type: object
+          description: Device position in the rack
+          properties:
+            startU:
+              type: integer
+              example: 12
+            endU:
+              type: integer
+              example: 14
+        endpoints:
+          type: array
+          description: list of OOB management IP addresses the device has
+          items:
+            type: string
+            format: ipv4
+            example: "192.168.1.101"
+        deviceConfiguration:
+          type: object
+          description: Custom device configurations
+          properties:
+            jsonBlob:
+              type: string
+        manufacturerAttributes:
+          type: object
+          description: Manufacturer attributes for a device
+          properties:
+            serialNumber:
+              type: string
+            partNumber:
+              type: string
+            modelNumber:
+              type: string
+            manufacturerName:
+              type: string
+            moduleId:
+              type: string
+              example: "G2i-05f0523c"
+        powerAttributes:
+          type: object
+          description: Power specification of the device
+          properties:
+            ratings:
+              type: string
+            coolingmeasure:
+              type: string
+        deviceMonetizationState:
+          type: boolean
+          description: Is this device in-use by workload
+          example: "True or False"
+        deviceMonetizationConfigLatest:
+          $ref: '#/components/schemas/DeviceMonetizationRecord'
+        locationId:
+          type: string
+          format: uuid
+          description: The datacenter Id where the device is installed.
+          readOnly: true
+    DeviceMonetizationRecord:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of resource creation
+          readOnly: true
+        tenantAssignmentState:
+          type: string
+          example: OneOf ["attached", "detached", "de-commissioned"]
+        attachedGlTenantId:
+          type: string
+          format: uuid
+          description: ID of the Greenlake tenant that this device is assigned to
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        deploymentId:
+          type: string
+          format: uuid
+          description: ID of the Greenlake deployment the rack is assigned to
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"         
+    RackEntry:
+      type: object
+      required:
+        - id
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique resource ID assigned to the rack
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        grn:
+          type: string
+          format: url
+          description: Unique greenlake resource name assigned to the rack
+          example: "eq/dcim/racks/:id"
+        role:
+          type: string
+          description: Enumeration value assigned to the rack based on its purpose
+          example: OneOf [Compute, Network, Storage]
+        datacenterId:
+          type: string
+          format: uuid
+          description: Datacenter ID where the rack is installed
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        status:
+          type: string
+          description: Enumeration value for operational state of the rack
+          example: OneOf ["PoweredON", "Maintenance", "Decommissioned"]
+        height:
+          type: string
+          description: Height of the racks in Rack units
+          example: "42U"
+        weight:
+          type: string
+          description: Weight of the device in lbs
+          example: "1.38lbs"     
+        width:
+          type: integer
+          description: Width of the device in mm
+          example: "600"               
+        depth:
+          type: integer
+          description: Depth of the device in mm
+          example: "1200"                         
+        rackConfiguration:
+          type: object
+          description: Custom rack configurations and details
+          properties:
+            jsonBlob:
+              type: string
+        manufacturerAttributes:
+          type: object
+          description: Manufacturer attributes for a rack
+          properties:
+            serialNumber:
+              type: string
+            partNumber:
+              type: string
+            modelNumber:
+              type: string
+            manufacturerName:
+              type: string
+            moduleId:
+              type: string
+              example: "R1"
+        powerAttributes:
+          type: object
+          description: Power specification of the device
+          properties:
+            ratings:
+              type: string
+            coolingmeasure:
+              type: string
+        deviceMonetizationState:
+          type: boolean
+          description: Is this device in-use by workload
+          example: "True or False"
+        deviceMonetizationConfigLatest:
+          $ref: '#/components/schemas/DeviceMonetizationRecord'
+        locationId:
+          type: string
+          format: uuid
+          description: The datacenter Id where the device is installed.
+          readOnly: true
+    StateEntry:
+      type: object
+      required:
+        - id
+        - createdAt
+        - credentials
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique ID of colo provider org
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of resource creation
+          readOnly: true
+        credentials:
+          type: string
+          description: The secure credentials to access colo APIs
+          readOnly: true
+    DeploymentEntry:
+      type: object
+      required:
+        - id
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique ID of deployment
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"
+        createdAt:
+          type: string
+          format: date-time
+          description: Time of resource creation
+          readOnly: true
+        shippingorderNumber:
+          type: string
+          description: Colo shipping order for a deployment
+          readOnly: true
+        locationGrn:
+          type: string
+          description: Location GRN where the deployment is attached to
+          readOnly: true
+          example: "api/regions/:RegionId/zones/:zoneId"
+        state:
+          type: string
+          enum: ["Attached", "Detached"]
+          description: State of the deployment
+          readOnly: true
+        racks:
+          type: array
+          description: Racks part of a deployment in a datacenter
+          items:
+            $ref: "#/components/schemas/RackEntry"
+        devices:
+          type: array
+          description: Devices part of the deployment in a datacenter
+          items:
+            $ref: "#/components/schemas/DeviceEntry"
+        fullRack:
+          type: boolean
+          description: "True if the deployment occupies entire rack. Else False"
+          readOnly: true
+          example: false
+    HeirarchicalInventory:
+      type: object
+      properties:
+        items:
+          type: array
+          description: list of facility
+          items:
+            $ref: "#/components/schemas/ColoFacility"
+        count:
+          type: integer
+          description: >-
+            The number of region resource entries returned
+          example: 5
+    ColoFacility:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique ID of location resource
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"       
+        grn:
+          type: string
+          format: url
+          description: URL of location resource in greenlake representing the entity
+          example: "/api/v1alpha1/regions/:id"                 
+        locationType:
+          type: string
+          description: Location type
+          example: "Region"                           
+        items:
+          type: array
+          description: list of datacenters or datahalls
+          items:
+            $ref: "#/components/schemas/ColoDatacenter"
+        count:
+          type: integer
+          description: >-
+            The number of datacenter entries returned
+          example: 15
+    ColoDatacenter:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique ID of location resource
+          example: "05f0523c-fd03-47fc-981b-9c4333a37b75"       
+        grn:
+          type: string
+          format: url
+          description: URL of location resource in greenlake representing the entity
+          example: "/api/v1alpha1/zone/:id"                 
+        locationType:
+          type: string
+          description: Location type
+          example: "AvailabilityZone"                           
+        racks:
+          type: array
+          description: Racks installed in the datacenter
+          items:
+            $ref: "#/components/schemas/RackEntry"
+        devices:
+          type: array
+          description: Devices part of a rack in a datacenter
+          items:
+           $ref: "#/components/schemas/DeviceEntry"
+        count:
+          type: integer
+          description: >-
+            The number of datacenter entries returned
+          example: 15
+    BadRequestError:
+      type: object
+      required:
+        - httpStatusCode
+        - errorCode
+        - message
+        - debugId
+      properties:
+        httpStatusCode:
+          type: integer
+          description: The HTTP equivalent status code
+          example: 400
+        errorCode:
+          type: string
+          description: A unique machine-friendly identifier for the error from a global list of enumerated identifier strings
+          example: "HPE_ORGS_EXPIRED_TOKEN"
+        message:
+          type: string
+          description: A user-friendly error message
+          example: "Authentication error"
+        debugId:
+          type: string
+          description: A unique identifier for the instance of this error
+          example: "12312-123123-123123-1231212"
+        errorDetails:
+          type: array
+          description: Additional detailed information about the error
+          items:
+            type: object
+            required:
+              - type
+              - issues
+            properties:
+              type:
+                type: string
+                description: The type of error details
+                example: "hpe.greenlake.bad_request"
+              issues:
+                type: array
+                description: Array of bad request issues
+                items:
+                  $ref: "#/components/schemas/BadRequestIssues"
+    BadRequestIssues:
+      type: object
+      required:
+        - source
+        - subject
+      properties:
+        source:
+          type: string
+          description: The part of the request with an issue
+          enum:
+            - field
+            - header
+            - query.parameter
+          example: "field"
+        subject:
+          type: string
+          description: The specific issue key
+          example: "user.email"
+        description:
+          type: string
+          description: An elaborate description of the issue. This can be used by developers to understand how the failure can be addressed
+          example: "Invalid format: email address length must be between 2 and 320 characters"
+    InternalServerError:
+      type: object
+      required:
+        - httpStatusCode
+        - errorCode
+        - message
+        - debugId
+      properties:
+        httpStatusCode:
+          type: integer
+          description: The HTTP equivalent status code
+          example: 400
+        errorCode:
+          type: string
+          description: A unique machine-friendly identifier for the error from a global list of enumerated identifier strings
+          example: "HPE_ORGS_EXPIRED_TOKEN"
+        message:
+          type: string
+          description: A user-friendly error message
+          example: "Authentication error"
+        debugId:
+          type: string
+          description: A unique identifier for the instance of this error
+          example: "12312-123123-123123-1231212"
+        errorDetails:
+          type: array
+          description: Additional detailed information about the error
+          items:
+            type: object
+            required:
+              - type
+              - retryAfterSeconds
+            properties:
+              type:
+                type: string
+                description: The type of error details
+                example: "hpe.greenlake.retry_info"
+              retryAfterSeconds:
+                type: integer
+                description: Seconds to wait before retrying
+                example: 30
+                default: 30
+    Error:
+      type: object
+      required:
+        - httpStatusCode
+        - errorCode
+        - message
+        - debugId
+      properties:
+        httpStatusCode:
+          type: integer
+          description: The HTTP equivalent status code
+          example: 401
+        errorCode:
+          type: string
+          description: A unique machine-friendly identifier for the error from a global list of enumerated identifier strings
+          example: "GLCP-0001"
+        message:
+          type: string
+          description: A user-friendly error message
+          example: "Authentication error"
+        debugId:
+          type: string
+          description: A unique identifier for the instance of this error. Maybe same as trace Id
+          example: "12312-123123-123123-1231212"
+        errorDetails:
+          type: array
+          description: Additional detailed information about the error
+          items:
+            type: object
+            required:
+              - type
+              - source
+              - metadata
+            properties:
+              type:
+                type: string
+                description: The type of error details
+                example: "hpe.greenlake.metadata"
+              source:
+                type: string
+                description: The source of the error. Typically a registered API group
+                example: "hpe.greenlake.iam"
+              metadata:
+                type: object
+                description: Any additional key value pairs that the service defines
+                properties:
+                  recommendedActions:
+                    type: array
+                    items:
+                      type: string
+                      description: Action recommended to the user
+                      example: "Contact admin to perform operation"
