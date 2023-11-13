@@ -17,3 +17,8 @@ func serializeProviderList(pm []models.ColoProvider) dcim.ProviderList {
 	}
 	return pl
 }
+
+func deserializeProvider(p models.ColoProvider) dcim.ColoProviderEntry {
+	pe := p.ColoProviderEntry
+	return pe
+}

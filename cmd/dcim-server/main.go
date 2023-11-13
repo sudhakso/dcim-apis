@@ -12,16 +12,10 @@ import (
 )
 
 func newHandler(db *gorm.DB) *handlers.DBHandler {
-	var err error
-	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
 	db.AutoMigrate(&models.ColoProvider{})
-	db.AutoMigrate(&models.Deployment{})
-	db.AutoMigrate(&models.Device{})
-	db.AutoMigrate(&models.Rack{})
+	// db.AutoMigrate(&models.Deployment{})
+	// db.AutoMigrate(&models.Device{})
+	// db.AutoMigrate(&models.Rack{})
 
 	return &handlers.DBHandler{db}
 }

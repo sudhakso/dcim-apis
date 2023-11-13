@@ -137,7 +137,7 @@ type ColoProviderEntry struct {
 	ProviderProperties *struct {
 		Prop1 *string `json:"prop1,omitempty"`
 		Prop2 *string `json:"prop2,omitempty"`
-	} `json:"providerProperties,omitempty"`
+	} `json:"providerProperties,omitempty" gorm:"embedded"`
 }
 
 // DeploymentEntry defines model for DeploymentEntry.

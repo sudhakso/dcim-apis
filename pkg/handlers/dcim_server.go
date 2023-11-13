@@ -62,6 +62,24 @@ func (d DcimServer) RegisterProvider(w http.ResponseWriter, r *http.Request) {
 	// Configure a Colo provider
 	// (POST /api/v1alpha1/providers/)
 
+	var provInput dcim.ProviderRegistrationInput
+	err := json.NewDecoder(r.Body).Decode(&provInput)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	// Create and serialize a provider
+	var p models.ColoProvider
+	p, err = d.H.CreateProvider(provInput)
+
+	// Prepare the response
+	var pe dcim.ColoProviderEntry
+	pe = deserializeProvider(p)
+
+	// Rest HTTP stuffs
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(pe)
 }
 
 func (d DcimServer) GetAllInventory(w http.ResponseWriter, r *http.Request, params dcim.GetAllInventoryParams) {
